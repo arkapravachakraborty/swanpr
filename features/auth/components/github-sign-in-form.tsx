@@ -1,7 +1,7 @@
 "use client"
 // import the button, spinner and formstatus
 import { Spinner } from "@/components/ui/spinner";
-import { Button } from "@base-ui/react";
+import { Button } from "@/components/ui/button";
 import { useFormStatus } from "react-dom";
 import { signInWithGithub } from "../actions";
 
@@ -37,7 +37,9 @@ function SubmitButton() {
     return (
         <Button
             type="submit"
-            className="w-full"
+            variant="outline"
+            size="lg"
+            className="w-full justify-center gap-2 rounded-xl border-border/80 bg-background hover:bg-accent"
             disabled={pending}
             aria-busy={pending}
         >

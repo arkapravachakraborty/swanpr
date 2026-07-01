@@ -11,12 +11,7 @@ import {
     CardDescription,
 } from "@/components/ui/card";
 
-import {
-    Field,
-    FieldDescription,
-    FieldGroup,
-    FieldSet,
-} from "@/components/ui/field";
+import { FieldDescription } from "@/components/ui/field";
 import { GithubSignInForm } from '@/features/auth/components/github-sign-in-form';
 
 
@@ -32,35 +27,33 @@ type SignInPageProps = {
 const SignInPage = async ({ searchParams }: SignInPageProps) => {
     const { callbackUrl } = await searchParams;
     return (
-        <Card className="border-border/80 shadow-sm">
-            <CardHeader className="items-center text-center">
-                <div className="mb-6 flex justify-center pt-2">
+        <Card className="w-full border-border/80 bg-background/95 shadow-sm">
+            <CardHeader className="items-center gap-3 px-6 pt-8 text-center sm:px-8">
+                <div className="flex justify-center pt-2">
                     <Image
-                        src="/logo2.svg"
-                        alt="Chai AI Code Reviewer"
+                        src="/logo2.png"
+                        alt="Swan Pr Code Reviewer"
                         width={172}
                         height={172}
                         priority
                         className="text-foreground"
                     />
                 </div>
-                <CardTitle className="text-base">Welcome back</CardTitle>
-                <CardDescription>
-                    Sign in with GitHub to review and manage your code.
-                </CardDescription>
+                <div className="space-y-2">
+                    <CardTitle className="text-xl">Welcome back</CardTitle>
+                    <CardDescription className="text-sm text-muted-foreground">
+                        Sign in with GitHub to review and manage your code.
+                    </CardDescription>
+                </div>
             </CardHeader>
-            <CardContent>
-                <FieldSet>
-                    <FieldGroup>
-                        <Field>
-                            <GithubSignInForm callbackUrl={callbackUrl} />
-                            <FieldDescription className="text-center">
-                                We only request the permissions needed to identify your
-                                account. You can revoke access anytime from GitHub settings.
-                            </FieldDescription>
-                        </Field>
-                    </FieldGroup>
-                </FieldSet>
+            <CardContent className="flex flex-col gap-5 px-6 pb-8 sm:px-8">
+                <div className="bg-red-700 rounded-2xl">
+                    <GithubSignInForm callbackUrl={callbackUrl} />
+                </div>
+                <FieldDescription className="mx-auto max-w-sm text-center text-xs text-muted-foreground balance-text">
+                    We only request the permissions needed to identify your
+                    account. You can revoke access anytime from GitHub settings.
+                </FieldDescription>
             </CardContent>
         </Card>
     )
