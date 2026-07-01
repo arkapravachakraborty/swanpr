@@ -6,7 +6,7 @@ import { useFormStatus } from "react-dom";
 import { signInWithGithub } from "../actions";
 
 // take the github icon SVG
-function GitHubIcon() {
+export function GitHubIcon() {
     return (
         <svg
             viewBox="0 0 24 24"
