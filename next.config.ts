@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  allowedDevOrigins: ['f282-117-214-61-193.ngrok-free.app'],
+  allowedDevOrigins: ['overmeek-ulterior-boyd.ngrok-free.dev'],
 };
 
 export default nextConfig;
