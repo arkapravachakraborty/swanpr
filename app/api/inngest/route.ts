@@ -1,8 +1,10 @@
 import { serve } from "inngest/next";
 import { inngest } from "@/features/inngest/client";
 import { processTask } from "./function";
+import { reviewPullRequest } from "@/features/review/server/review-pr-function";
+import { syncRepoCodebaseFunction } from "@/features/repo-sync/server/repo-sync-function";
 
 export const { GET, POST, PUT } = serve({
     client: inngest,
-    functions: [processTask],
+    functions: [processTask, reviewPullRequest, syncRepoCodebaseFunction],
 });
