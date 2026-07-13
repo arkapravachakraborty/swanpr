@@ -3,6 +3,9 @@ import { prisma } from "@/lib/db";
 import { getPullRequestFiles } from "./pr-files";
 import { chunkPrFiles } from "../utils/chunk-code";
 import { generateReview } from "./generate-review";
+import { buildPrNamespace, saveChunksToPinecone, searchPrContext } from "./vector";
+import { buildRepoNamespace } from "@/features/repo-sync/server/repo-sync";
+import { postPrComment } from "./post-pr-comment";
 
 export const reviewPullRequest = inngest.createFunction(
     { id: "review-pull-request", triggers: { event: "github/pr.received" } },
@@ -20,7 +23,7 @@ export const reviewPullRequest = inngest.createFunction(
             })
         });
 
-        const chunk = await step.run("breakdown-code", async () => {
+        const chunks = await step.run("breakdown-code", async () => {
             const files = await getPullRequestFiles(
                 pullRequest.installationId,
                 pullRequest.repoFullName,
@@ -31,7 +34,7 @@ export const reviewPullRequest = inngest.createFunction(
             return chunkPrFiles(pullRequest.prNumber, files);
         });
 
-        if (chunk.length === 0) {
+        if (chunks.length === 0) {
             await step.run("mark-reviewed-no-code", async () => {
                 await prisma.pullRequest.update({
                     where: { id: pullRequestId },
@@ -41,17 +44,46 @@ export const reviewPullRequest = inngest.createFunction(
 
             return { pullRequestId, status: "reviewed", reason: "no code to review" };
         }
-        // TODO: PR namespace isolates this diff from other PRs and from repo-wide sync data (add for pinecone db)
+        // PR namespace isolates this diff from other PRs and from repo-wide sync data
+        const namespace = buildPrNamespace(
+            pullRequest.repoFullName,
+            pullRequest.prNumber
+        );
+
+        await step.run("save-vectors-to-pinecone", async () => {
+            await saveChunksToPinecone(namespace, chunks);
+        });
 
         await step.sleep("wait-for-vectors-to-index", "10s")
 
         // repo context Snippet
+        // Extra context from the on-demand codebase sync, when the repo was synced
+        const repoContextSnippets = await step.run("search-repo-context", async () => {
+            const repoSync = await prisma.repoSync.findUnique({
+                where: { repoFullName: pullRequest.repoFullName },
+            });
+
+            if (!repoSync || repoSync.status !== "synced") {
+                return [];
+            }
+
+            const repoNamespace = buildRepoNamespace(pullRequest.repoFullName);
+            return searchPrContext(repoNamespace, pullRequest.title);
+        });
 
         const review = await step.run("generate-ai-review", async () => {
+            // Search within this PR's namespace for chunks related to the PR title
+            const contextSnippets = await searchPrContext(
+                namespace,
+                pullRequest.title
+            );
+
             return generateReview({
                 repoFullName: pullRequest.repoFullName,
                 title: pullRequest.title,
-            })
+                contextSnippets,
+                repoContextSnippets,
+            });
         });
 
         await step.run("post-pr-comment", async () => {
@@ -61,7 +93,7 @@ export const reviewPullRequest = inngest.createFunction(
                 pullRequest.prNumber,
                 review,
             );
-        })
+        });
 
         await step.run("mark-reviewed", async () => {
             await prisma.pullRequest.update({

@@ -6,7 +6,7 @@ import { getUserInstallationId } from "@/features/github/server/installation";
 import { redirect } from "next/navigation";
 import { triggerRepoSync } from "../server/repo-sync";
 
-export async function syncRepo(repoFullName: string, branch: string) {
+export async function syncRepoCodebase(repoFullName: string, branch: string) {
     // get the session from the serversession
     const session = await getServerSession();
     // no session redirect to signin
