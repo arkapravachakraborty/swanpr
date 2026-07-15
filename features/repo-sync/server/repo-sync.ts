@@ -33,7 +33,8 @@ type TreeEntry = {
 
 // we have index, inside that we have namspaces, inside that we have file details
 export function buildRepoNamespace(repoFullName: string) {
-    return `${repoFullName.replace("/", "--")}--codebase`;
+    const safeRepoName = encodeURIComponent(repoFullName).replace(/%/g, "_");
+    return `${safeRepoName}--codebase`;
 }
 
 // check if the file has a code extension
@@ -65,7 +66,9 @@ function isIndexableFile(entry: TreeEntry) {
 
 // build a chunk id for a file path and part number
 function buildChunkId(filePath: string, part: number) {
-    return `repo--${filePath}--part-${part}`;
+    // change the file path to a safe string by replacing all non-alphanumeric characters with underscores
+    const safeFilePath = encodeURIComponent(filePath).replace(/%/g, "_");
+    return `repo--${safeFilePath}--part-${part}`;
 }
 
 // split the files into chunks of MAX_CHUNK_LINES lines

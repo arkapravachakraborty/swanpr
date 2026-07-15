@@ -46,7 +46,7 @@ export const syncRepoCodebaseFunction = inngest.createFunction({
             })
         }
 
-        await step.run("save-vector-to-pinecone", async () => {
+        await step.run("save-vectors-to-pinecone", async () => {
             await saveRepoChunks(namespace, chunks);
         });
 
