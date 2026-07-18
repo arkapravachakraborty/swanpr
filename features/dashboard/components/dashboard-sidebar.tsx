@@ -33,7 +33,8 @@ export function DashboardSidebar({ user, plan = "Pro" }: DashboardSidebarProps) 
                             size="lg"
                             tooltip="SwanPR"
                             render={
-                                <Link href={DASHBOARD_ROUTES.overview}>
+                                // change this to a link from the dashboard overview page to the home page of the app
+                                <Link href={"/"}>
                                     <span className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-none bg-sidebar">
                                         <Image
                                             src="/logo2.png"
