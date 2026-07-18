@@ -12,18 +12,14 @@ export async function signInWithGithub(formData: FormData) {
     const callback = formData.get("callbackUrl");
 
     // sanitize the callback path and sends it
-    // 1. Get the safe relative path (e.g., "/dashboard")
     const redirectTo = getSafeCallbackPath(
         typeof callback === "string" ? callback : null
     )
-    // 2. Combine it with your Base URL to make it a true absolute path
-    const baseUrl = process.env.BETTER_AUTH_URL || "http://localhost:3000";
-    const absoluteCallbackUrl = `${baseUrl.replace(/\/$/, "")}${redirectTo}`;
 
     const result = await auth.api.signInSocial({
         body: {
             provider: "github",
-            callbackURL: absoluteCallbackUrl,
+            callbackURL: redirectTo,
         },
         headers: await headers(),
     })
