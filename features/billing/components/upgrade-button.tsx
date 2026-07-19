@@ -72,15 +72,27 @@ export function UpgradeButton() {
 
     }
 
+    async function comingSoon() {
+        toast.info("Coming soon", {
+            description: "The upgrade flow is not available yet. Please check back soon.",
+        });
+    }
+
     return (
         <>
             <Script src={RAZORPAY_SCRIPT_URL} strategy="lazyOnload"></Script>
-            <Button
+            {/* <Button
                 onClick={handleUpgrade}
                 disabled={loading}
                 className={cn(statusButtonClass.success)}
             >
                 {loading ? "Opening checkout…" : "Upgrade to Pro"}
+            </Button> */}
+            <Button
+                onClick={comingSoon}
+                className={cn(statusButtonClass.success)}
+            >
+                Coming Soon
             </Button>
         </>
     )
